@@ -1,4 +1,7 @@
--- Doc
+-- Create a table named `users` with the following columns:
+-- id: integer, not null, auto increment, primary key
+-- email: string (255 characters), not null, unique
+-- name: string (255 characters)
 
 CREATE TABLE IF NOT EXISTS users (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,

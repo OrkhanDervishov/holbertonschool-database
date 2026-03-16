@@ -1,4 +1,4 @@
--- Doc
+-- Create a trigger that decreases the quantity of an item after a new order
 
 CREATE TRIGGER decrease_quantity
 AFTER INSERT ON orders

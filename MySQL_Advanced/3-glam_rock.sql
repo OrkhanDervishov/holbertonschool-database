@@ -1,4 +1,4 @@
--- Doc
+-- List all Glam rock bands ranked by their lifespan (in years)
 
 SELECT band_name, (split - formed) AS lifespan
 FROM metal_bands
