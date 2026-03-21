@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-This module has a Cache class with __init__ method and a private variable 
+This module has a Cache class with init method and a private variable 
 """
 import uuid
 from typing import Union, Callable, Optional
@@ -9,45 +9,25 @@ from functools import wraps
 
 def count_calls(method: Callable) -> Callable:
     @wraps(method)
-    def wrapper(self, *args, **kwargs):
-        key = method.__qualname__
+    def wrapper(self, args, **kwargs):
+        key = method.qualname
         self._redis.incr(key)
-        return method(self, *args, **kwargs)
+        return method(self,args, **kwargs)
     return wrapper
 
-def call_history(method: Callable) -> Callable:
-    """Decorator to store history of inputs and outputs"""
-    @wraps(method)
-    def wrapper(self, *args, **kwargs):
-        input_key = f"{method.__qualname__}:inputs"
-        output_key = f"{method.__qualname__}:outputs"
-
-        # Store input arguments as string
-        self._redis.rpush(input_key, str(args))
-
-        # Call the original method
-        result = method(self, *args, **kwargs)
-
-        # Store output
-        self._redis.rpush(output_key, result)
-
-        return result
-    return wrapper
-                
 class Cache:
     """
-    A class with __init__ method and a private variable
+    A class with init method and a private variable
     """
-    def __init__(self) -> None:
+    def init(self) -> None:
         """
         Method that initializes redis instance and flushes the db
         """
         import redis
-        
+
         self._redis = redis.Redis()
         self._redis.flushdb()
 
-    @call_history
     @count_calls
     def store(self, data: Union[str, bytes, int, float]) -> str:
         """
@@ -57,13 +37,13 @@ class Cache:
         self._redis.set(key, data)
 
         return key
-    
+
     def get(self, key: str, fn: Optional[Callable] = None) -> Union[int, bytes, float, str, None]:
         """
         Retrieves data from redis and applies optional conversion
         """
         data = self._redis.get(key)
-        if key is not None and fn is not None:
+        if data is not None and fn is not None:
             return fn(data) 
         return data
 
@@ -80,25 +60,3 @@ class Cache:
         """
         key = self.get(key, int)
         return key
-    
-
-def replay(method: Callable) -> None:
-    """
-    Display the history of calls of a particular function
-    """
-    redis = method.__self__._redis  # Access the Redis client from the instance
-    name = method.__qualname__
-
-    input_key = f"{name}:inputs"
-    output_key = f"{name}:outputs"
-
-    # Retrieve inputs and outputs
-    inputs = redis.lrange(input_key, 0, -1)
-    outputs = redis.lrange(output_key, 0, -1)
-
-    # Print total calls
-    print(f"{name} was called {len(outputs)} times:")
-
-    # Loop over inputs and outputs
-    for inp, out in zip(inputs, outputs):
-        print(f"{name}(*{inp.decode('utf-8')}) -> {out.decode('utf-8')}")
