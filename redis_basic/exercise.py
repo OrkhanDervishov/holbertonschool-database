@@ -2,6 +2,7 @@
 """
 Doc
 """
+
 import uuid
 from typing import Union
 
@@ -14,18 +15,17 @@ except ImportError:
 class Cache:
     """Doc"""
 
-    def __init__(self) -> None:
+    def __init__(self):
         """Doc"""
-        if redis is not None:
+        if redis:
             self._redis = redis.Redis()
             self._redis.flushdb()
         else:
             self._redis = None
 
     def store(self, data: Union[str, bytes, int, float]) -> str:
-        """
-        Doc
-        """
-        random_key = str(uuid.uuid4())
-        self._redis.set(random_key, data)
-        return random_key
+        """Doc"""
+        key = str(uuid.uuid4())
+        if self._redis:
+            self._redis.set(key, data)
+        return key
