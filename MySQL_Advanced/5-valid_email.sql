@@ -1,9 +1,11 @@
--- Reset valid_email only when the email is changed
--- If the email remains the same, valid_email should not change
-
-CREATE TRIGGER reset_valid_email
+-- Create a table named `users` with the following columns:
+DELIMITER $$
+CREATE TRIGGER reset_valid_email_update
 BEFORE UPDATE ON users
 FOR EACH ROW
-IF OLD.email <> NEW.email THEN
-    SET NEW.valid_email = 0;
+BEGIN
+	IF OLD.email <> NEW.email THEN
+	SET NEW.valid_email = 0;
 END IF;
+END $$
+DELIMITER ;
