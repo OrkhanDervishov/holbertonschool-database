@@ -27,6 +27,5 @@ class Cache:
         Doc
         """
         key = str(uuid.uuid4())
-        if self._redis is not None:
-            self._redis.set(key, data)
+        self._redis.set(key, data)
         return key
