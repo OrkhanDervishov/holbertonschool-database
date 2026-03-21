@@ -80,3 +80,25 @@ class Cache:
         """
         key = self.get(key, int)
         return key
+    
+
+def replay(method: Callable) -> None:
+    """
+    Display the history of calls of a particular function
+    """
+    redis = method.__self__._redis  # Access the Redis client from the instance
+    name = method.__qualname__
+
+    input_key = f"{name}:inputs"
+    output_key = f"{name}:outputs"
+
+    # Retrieve inputs and outputs
+    inputs = redis.lrange(input_key, 0, -1)
+    outputs = redis.lrange(output_key, 0, -1)
+
+    # Print total calls
+    print(f"{name} was called {len(outputs)} times:")
+
+    # Loop over inputs and outputs
+    for inp, out in zip(inputs, outputs):
+        print(f"{name}(*{inp.decode('utf-8')}) -> {out.decode('utf-8')}")
