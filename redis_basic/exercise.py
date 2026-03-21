@@ -4,7 +4,12 @@ Doc
 """
 import uuid
 from typing import Union
-import redis
+
+try:
+    import redis
+except ImportError:
+    redis = None
+
 
 class Cache:
     """Doc"""
