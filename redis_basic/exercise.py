@@ -13,6 +13,7 @@ except ImportError:
 
 
 class Cache:
+    
     """Doc"""
 
     def __init__(self):
@@ -29,3 +30,12 @@ class Cache:
         if self._redis:
             self._redis.set(key, data)
         return key
+
+cache = Cache()
+
+data = b"hello"
+key = cache.store(data)
+print(key)
+
+local_redis = redis.Redis()
+print(local_redis.get(key))
